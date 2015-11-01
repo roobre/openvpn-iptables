@@ -31,7 +31,7 @@ if [ "$1" == "start" ]; then
 	ip route add $(ip route | grep default | sed "s/default/$trusted_ip/") table $TABLE
 	## Add other routes except default and gateways, which are the ones overriden
 	IFS=$'\n'
-	for r in $(ip route show table main | grep -v '^default\|via'); do
+	for r in $(ip route show table main | grep -v '^default'); do
 	unset IFS
 		ip route add $r table $TABLE >> /tmp/routes
 	done
