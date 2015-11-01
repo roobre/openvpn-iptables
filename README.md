@@ -51,6 +51,11 @@ Here is an example configuration:
     # Exclude HTTPs to a host
     #-A OUTPUT -d tenshi.com.es -p tcp --dport 443 -j ACCEPT
 
+    # Exclude OpenVPN to Tenshi
+    # The setup WOULD work even without this rule, but we will have an vpn-over-vpn scenario,
+    #  which is not desirable.
+    -A OUTPUT -d tenshi -p udp --dport 1194 -j ACCEPT
+
 
     # Mark to route the rest over VPN
     -A OUTPUT -j MARK --set-xmark 0x1/0xffffffff
