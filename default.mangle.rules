@@ -1,0 +1,25 @@
+*mangle
+
+# Rules
+# =====
+
+# Mark outgoing dscp packets
+-A OUTPUT -p tcp -m tcp --dport 22 -m conntrack --ctstate NEW -j DSCP --set-dscp 40
+
+
+# VPN-related stuff
+
+# Exclude SSH
+-A OUTPUT -p tcp --dport 22 -j ACCEPT
+
+# Exclude HTTPs to Tenshi
+#-A OUTPUT -d tenshi.com.es -p tcp --dport 443 -j ACCEPT
+
+# Exclude OpenVPN to Tenshi
+-A OUTPUT -d tenshi -p udp --dport 1194 -j ACCEPT
+
+
+# Mark to route the rest over VPN
+-A OUTPUT -j MARK --set-xmark 0x1/0xffffffff
+
+COMMIT
