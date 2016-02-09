@@ -8,17 +8,7 @@ It should not conflict with another running openVPN instances, local routes, and
 
 # Setting up
 
-## 1. Create a new routing table
-
-This step must be done only once, so it's not handled by the script. You can add a new routing table
-by issuing the following command:
-
-    echo "200   pia-vpn" >> /etc/iproute2/rt_tables
-
-`pia-vpn` is the name I chose for the table. If you wish to change it, remember to modify the `route.sh` script
-accordingly.
-
-## 2. Modify openVPN config file to call the script.
+## 1. Modify openVPN config file to call the script.
 
 Add the following to your openVPN config file:
 
@@ -31,7 +21,7 @@ Add the following to your openVPN config file:
     # Allow user-defined script execution
     script-security 2
 
-## 3. Create your iptables rules to mark packets at will
+## 2. Create your iptables rules to mark packets at will
 
 My personal favourite way is to call iptables-restore after connecting to a network profile, but you can use whichever
 method you like. This rules won't break internet connection if the VPN is down, so restoring them on boot is perfectly
@@ -39,7 +29,8 @@ fine if you want.
 
 Here is an example configuration:
 
-    [root@Archpv3]# ~> cat /etc/iptables/default.mangle.rules 
+### `[root@Archpv3]# ~> cat /etc/iptables/default.mangle.rules`
+
     *mangle
 
     # Rules
