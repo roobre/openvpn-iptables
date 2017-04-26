@@ -31,11 +31,6 @@ PREFERENCE='32000'
 # Set to zero only if you have other scripts/setups depending on the nat table.
 FLUSH_NAT=true
 
-# Path to iptables binary
-iptables='/usr/bin/iptables'
-## Debian users should use this path instead:
-#iptables='/sbin/iptables'
-
 # =============
 
 
@@ -43,7 +38,7 @@ iptables='/usr/bin/iptables'
 
 # Clean nat table
 ## TODO: Avoid flushing the entire table, find some way to delete only the rules which can interfere.
-[[ $FLUSH_NAT ]] && $iptables -t nat -F
+[[ $FLUSH_NAT ]] && iptables -t nat -F
 
 # Clean ip rule
 ip rule del fwmark $MARK lookup $TABLE 2> /dev/null
@@ -54,14 +49,14 @@ ip route flush table $TABLE
 
 if [ "$1" == "start" ]; then
     # Add table to /etc/iproute2/rt_tables if missing
-    grep -e "$TABLE_ID\s\+$TABLE" /etc/iproute2/rt_tables || echo -e "$TABLE_ID\t$TABLE" >> /etc/iproute2/rt_tables
+    grep -e "$TABLE_ID\s\+$TABLE$" /etc/iproute2/rt_tables &> /dev/null || echo -e "$TABLE_ID\t$TABLE" >> /etc/iproute2/rt_tables
 
     # Disable source route checking
     sysctl -w net.ipv4.conf.all.rp_filter=0 > /dev/null
     sysctl -w net.ipv4.conf.$dev.rp_filter=0 > /dev/null
 
     # Mangle source ip if wrong
-    $iptables -t nat -I POSTROUTING ! -s $ifconfig_local -o $dev -j SNAT --to-source $ifconfig_local
+    iptables -t nat -I POSTROUTING ! -s $ifconfig_local -o $dev -j SNAT --to-source $ifconfig_local
 
     # Add default route to VPN table
     ip route add default via $route_vpn_gateway dev $dev src $ifconfig_local table $TABLE
