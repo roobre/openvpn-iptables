@@ -40,13 +40,15 @@ Here is an example configuration:
     -A OUTPUT -p tcp --dport 22 -j ACCEPT
 
     # Exclude HTTPs to a host
-    #-A OUTPUT -d tenshi.com.es -p tcp --dport 443 -j ACCEPT
+    -A OUTPUT -d tenshi.com.es -p tcp --dport 443 -j ACCEPT
 
-    # Exclude OpenVPN to Tenshi
-    # The setup WOULD work even without this rule, but we will have an vpn-over-vpn scenario,
-    #  which is not desirable.
+    # Exclude other OpenVPN instances (to avoid sending vpn traffic over another vpn)
     -A OUTPUT -d tenshi -p udp --dport 1194 -j ACCEPT
-
+    
+    # Exclude local networks (routes which exist when the script is run are copied to the
+    #  vpn table, so this isn't really _necessary_. But it can help in some scenarios.
+    -A OUTPUT -d 10.0.0.0/8 -j ACCEPT
+    -A OUTPUT -d 192.168.0.0/16 -j ACCEPT
 
     # Mark to route the rest over VPN
     -A OUTPUT -j MARK --set-xmark 0x1/0xffffffff
